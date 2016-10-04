@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block jumbotron %}
+<div class="row">
+  <div class="col-sm-12 center_div">
+    <div class="col-xs-3">
+      {{ wtf.quick_form(forma, action='/login')}}
+    </div>
+  </div>
+</div>
+{% endblock %}
