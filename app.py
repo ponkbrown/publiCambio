@@ -1,15 +1,19 @@
-from flask import Flask, render_template, redirect, flash, session, url_for
+from flask import Flask, render_template, redirect, flash, session, url_for, request, g
+from werkzeug.utils import secure_filename
 from flask_script import Manager
 from flask_bootstrap import Bootstrap
-from models import db, Cambio, Ubicacion 
+from models import db, Cambio, Ubicacion
 from flask_migrate import Migrate, MigrateCommand
-from formas import Contrasena, CambioForma
+from formas import Contrasena, CambioForma, FotoForma
 from datetime import datetime, timedelta
 
 password = 'oibmac'
+UPLOAD_FOLDER = './upload'
+ALLOWED_EXTENTIONS = set(['jpg', 'jpeg', 'png', 'gif'])
 
 app = Flask(__name__)
 app.secret_key = '07go8dqjg8907go8dqjg8907go8dqjg89'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 Bootstrap(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -40,10 +44,10 @@ def login():
     # Si en la cookie esta 'login' dejalo pasar
     if 'login' in session:
         return redirect(url_for('update'))
-    
+
     if forma.validate_on_submit():
         contrasena = forma.contrasena.data
-        if contrasena == password: 
+        if contrasena == password:
             session['login'] = 'si'
             flash('Exito')
             return redirect(url_for('update'))
@@ -52,15 +56,23 @@ def login():
 
 @app.route('/update', methods=('GET', 'POST'))
 def update():
+    fecha = datetime.now()
     if not 'login' in session:
         return redirect(url_for('login'))
-    return render_template('enviar.html')
+    forma = CambioForma()
+    if request.method == 'POST' and forma.validate():
+        cambio = Cambio(compra=forma.data['compra'], venta=forma.data['venta'], timestamp=fecha)
+        db.session.add(cambio)
+        db.session.commit()
+        session['cambio_id'] = cambio.id
+        return redirect('/exito')
+    return render_template('cambioUpdate.html', forma=forma, fecha=fecha)
 
 @app.route('/exito')
 def exito():
+    cambio = Cambio.query.filter_by(id=session['cambio_id']).first()
     flash('¡Exito!')
     return redirect('/')
-
 
 
 if __name__ == '__main__':

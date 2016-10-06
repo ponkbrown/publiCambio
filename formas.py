@@ -7,9 +7,11 @@ class Contrasena(Form):
     login = SubmitField('Ingresar')
 
 class CambioForma(Form):
-    nombre = StringField('Nombre')
     compra = FloatField('Compra', validators=[DataRequired()])
-    venta =  FloatField('Venta', validators=[DataRequired()])   
-    foto = FileField('Foto')
+    venta =  FloatField('Venta', validators=[DataRequired()])
     enviar = SubmitField('Enviar')
 
+class FotoForma(Form):
+    nombre = StringField('Nombre')
+    foto = FileField('Foto')
+    enviar = SubmitField('Enviar')

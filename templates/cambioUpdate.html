@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block title %} Codigo | publiCambio {% endblock %}
+
+{% block jumbotron %}
+<h3>{{ fecha }}</h3>
+{{ wtf.quick_form(forma) }}
+{% endblock %}
