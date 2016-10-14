@@ -1,11 +1,12 @@
 from flask import Flask, render_template, redirect, flash, session, url_for, request, g
-from werkzeug.utils import secure_filename
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 from flask_script import Manager
 from flask_bootstrap import Bootstrap
 from models import db, Cambio, Ubicacion
 from flask_migrate import Migrate, MigrateCommand
 from formas import Contrasena, CambioForma, FotoForma
 from datetime import datetime, timedelta
+from funciones import findGPS
 
 password = 'oibmac'
 UPLOAD_FOLDER = './upload'
@@ -19,6 +20,9 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
+# Configurar flask_uploads
+photos = UploadSet('photos', IMAGES)
+app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///basedatos.sqlite'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -65,8 +69,18 @@ def update():
         db.session.add(cambio)
         db.session.commit()
         session['cambio_id'] = cambio.id
-        return redirect('/exito')
+        return redirect(url_for('upload'))
     return render_template('cambioUpdate.html', forma=forma, fecha=fecha)
+
+@app.route('/upload', methods=('GET', 'POST'))
+def upload():
+    if request.method == 'POST' and 'photo' in request.files:
+        filename = photos.save(request.files['photo'])
+        cordenadas = findGPS('static/img/'+filename)
+        flash('exito')
+        return redirect(url_for('main'))
+
+    return render_template('upload.html')
 
 @app.route('/exito')
 def exito():
