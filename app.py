@@ -9,12 +9,13 @@ from datetime import datetime, timedelta
 from funciones import findGPS
 
 password = 'oibmac'
-UPLOAD_FOLDER = './upload'
+UPLOAD_FOLDER = './upload/'
 ALLOWED_EXTENTIONS = set(['jpg', 'jpeg', 'png', 'gif'])
 
 app = Flask(__name__)
 app.secret_key = '07go8dqjg8907go8dqjg8907go8dqjg89'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOADED_PHOTOS_DEST'] = UPLOAD_FOLDER
 Bootstrap(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -22,7 +23,7 @@ manager.add_command('db', MigrateCommand)
 
 # Configurar flask_uploads
 photos = UploadSet('photos', IMAGES)
-app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
+configure_uploads(app, photos)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///basedatos.sqlite'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -76,7 +77,7 @@ def update():
 def upload():
     if request.method == 'POST' and 'photo' in request.files:
         filename = photos.save(request.files['photo'])
-        cordenadas = findGPS('static/img/'+filename)
+        cordenadas = findGPS(UPLOAD_FOLDER+filename)
         flash('exito')
         return redirect(url_for('main'))
 
