@@ -76,12 +76,21 @@ def update():
 @app.route('/upload', methods=('GET', 'POST'))
 def upload():
     forma = FotoForma()
-    import pdb; pdb.set_trace()
     #if request.method == 'POST' and 'photo' in request.files:
     if request.method == 'POST' and forma.validate():
+        serviceurl = "http://maps.googleapis.com/maps/api/geocode/json?"
+        if session['cambio_id']: cambio_id = session['cambio_id']
+        if forma.nombre.data == '':
+            nombre = 'DESCONOCIDO'
+        else:
+            nombre = forma.nombre.data
+        cambioObj = db.session.query(Cambio).filter_by(id=cambio_id).first()
         filename = photos.save(request.files['foto'])
         cordenadas = findGPS(UPLOAD_FOLDER+filename)
-        pdb.set_trace()
+        import pdb; pdb.set_trace()
+        ubicacionObj = Ubicacion(nombre=nombre, latitud = cordenadas[0], longitud = cordenadas[1], cambios=[cambioObj])
+        db.session.add(ubicacionObj)
+        db.session.commit()
         flash('exito')
         return redirect(url_for('main'))
 
