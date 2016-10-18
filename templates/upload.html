@@ -3,10 +3,14 @@
 {% block title %} Codigo | publiCambio {% endblock %}
 
 {% block jumbotron %}
+<!--
 <form method=POST enctype=multipart/form-data action="{{ url_for('upload') }}">
 <input type="file" name="photo">
 <input type="submit">
 </form>
+-->
+
+{{ wtf.quick_form(forma)}}
 
 
 {% endblock %}

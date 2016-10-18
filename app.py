@@ -75,13 +75,17 @@ def update():
 
 @app.route('/upload', methods=('GET', 'POST'))
 def upload():
-    if request.method == 'POST' and 'photo' in request.files:
-        filename = photos.save(request.files['photo'])
+    forma = FotoForma()
+    import pdb; pdb.set_trace()
+    #if request.method == 'POST' and 'photo' in request.files:
+    if request.method == 'POST' and forma.validate():
+        filename = photos.save(request.files['foto'])
         cordenadas = findGPS(UPLOAD_FOLDER+filename)
+        pdb.set_trace()
         flash('exito')
         return redirect(url_for('main'))
 
-    return render_template('upload.html')
+    return render_template('upload.html', forma=forma)
 
 @app.route('/exito')
 def exito():
