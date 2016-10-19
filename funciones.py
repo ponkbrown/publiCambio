@@ -1,4 +1,6 @@
 import exifread
+import json
+import requests
 
 def exifobj2lista(objDatos):
     ''' Recibe un objeto tag GPS de exifdata y devuelve una tupla de
@@ -44,3 +46,27 @@ def findGPS(imagen):
 
     print('No se encontraron los datos exif para GPS')
     return (None)
+
+def reverseGeo(latitud, longitud, api='GoogleApi.secret'):
+    ''' Encuentra la direccion a partir de los datos GEO latitud y longitud
+    se requiere de un api de google '''
+    
+    #Cargamos el api
+    with open(api, 'r') as f:
+        GAPI = json.loads(f.read())
+
+    url = GAPI['url']
+    payload = { 'latlng' : str(latitud)+','+str(longitud), api : GAPI['api'] }
+
+    r = requests.get(url, params=payload )
+    if r.ok:
+        resultado = json.loads(r.text)
+        direccion = resultado['results'][0]['formatted_address']
+    else:
+        return 'No se pudo obtener la direccion'
+
+    return direccion
+
+
+
+    return 

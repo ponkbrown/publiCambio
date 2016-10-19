@@ -9,4 +9,6 @@ dist/
 lib/
 
 *.swp
+*.jpg
 
+*.secret

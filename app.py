@@ -6,7 +6,7 @@ from models import db, Cambio, Ubicacion
 from flask_migrate import Migrate, MigrateCommand
 from formas import Contrasena, CambioForma, FotoForma
 from datetime import datetime, timedelta
-from funciones import findGPS
+from funciones import findGPS, reverseGeo
 
 password = 'oibmac'
 UPLOAD_FOLDER = './upload/'
@@ -78,7 +78,6 @@ def upload():
     forma = FotoForma()
     #if request.method == 'POST' and 'photo' in request.files:
     if request.method == 'POST' and forma.validate():
-        serviceurl = "http://maps.googleapis.com/maps/api/geocode/json?"
         if session['cambio_id']: cambio_id = session['cambio_id']
         if forma.nombre.data == '':
             nombre = 'DESCONOCIDO'
@@ -86,10 +85,17 @@ def upload():
             nombre = forma.nombre.data
         cambioObj = db.session.query(Cambio).filter_by(id=cambio_id).first()
         filename = photos.save(request.files['foto'])
-        cordenadas = findGPS(UPLOAD_FOLDER+filename)
-        import pdb; pdb.set_trace()
-        ubicacionObj = Ubicacion(nombre=nombre, latitud = cordenadas[0], longitud = cordenadas[1], cambios=[cambioObj])
-        db.session.add(ubicacionObj)
+        cambioObj.foto = filename
+        try:
+            cordenadas = findGPS(UPLOAD_FOLDER+filename)
+        except:
+            flash('No se pudo obtener los datos GEO de la imagen')
+            return redirect(url_for('upload'))
+
+        # Obtener la direccion de Google Maps (reverseGeocoding)
+        direccion = reverseGeo(cordenadas[0], cordenadas[1])
+        ubicacionObj = Ubicacion(nombre=nombre, latitud = cordenadas[0], longitud = cordenadas[1], direccion=direccion, cambios=[cambioObj])
+        db.session.add_all([ubicacionObj, cambioObj])
         db.session.commit()
         flash('exito')
         return redirect(url_for('main'))
