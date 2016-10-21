@@ -5,8 +5,9 @@ from flask_bootstrap import Bootstrap
 from models import db, Cambio, Ubicacion
 from flask_migrate import Migrate, MigrateCommand
 from formas import Contrasena, CambioForma, FotoForma
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from funciones import findGPS, reverseGeo, findDatetime
+from sqlalchemy import func
 
 password = 'oibmac'
 UPLOAD_FOLDER = './upload/'
@@ -65,13 +66,14 @@ def update():
     if not 'login' in session:
         return redirect(url_for('login'))
     forma = CambioForma()
+    capturasHoy = db.session.query(Cambio).filter(func.date(Cambio.timestamp)==date.today()).all()
     if request.method == 'POST' and forma.validate():
         cambio = Cambio(compra=forma.data['compra'], venta=forma.data['venta'], timestamp=fecha)
         db.session.add(cambio)
         db.session.commit()
         session['cambio_id'] = cambio.id
         return redirect(url_for('upload'))
-    return render_template('cambioUpdate.html', forma=forma, fecha=fecha)
+    return render_template('cambioUpdate.html', forma=forma, fecha=fecha, capturasHoy=capturasHoy)
 
 @app.route('/upload', methods=('GET', 'POST'))
 def upload():
