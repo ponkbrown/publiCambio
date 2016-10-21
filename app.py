@@ -6,7 +6,7 @@ from models import db, Cambio, Ubicacion
 from flask_migrate import Migrate, MigrateCommand
 from formas import Contrasena, CambioForma, FotoForma
 from datetime import datetime, timedelta
-from funciones import findGPS, reverseGeo
+from funciones import findGPS, reverseGeo, findDatetime
 
 password = 'oibmac'
 UPLOAD_FOLDER = './upload/'
@@ -78,14 +78,15 @@ def upload():
     forma = FotoForma()
     #if request.method == 'POST' and 'photo' in request.files:
     if request.method == 'POST' and forma.validate():
-        if session['cambio_id']: cambio_id = session['cambio_id']
+        if session['cambio_id']: cambio_id = session['cambio_id']   #Aqui obtenemos el id de cambio que pusimos en session, no encontre otra forma de hacerlo
         if forma.nombre.data == '':
             nombre = 'DESCONOCIDO'
         else:
             nombre = forma.nombre.data
-        cambioObj = db.session.query(Cambio).filter_by(id=cambio_id).first()
+        cambioObj = db.session.query(Cambio).filter_by(id=cambio_id).first() # Recreamos el objeto cambio a partir de un query
         filename = photos.save(request.files['foto'])
         cambioObj.foto = filename
+        cambioObj.exiftimestamp = findDatetime(UPLOAD_FOLDER+filename)
         try:
             cordenadas = findGPS(UPLOAD_FOLDER+filename)
         except:

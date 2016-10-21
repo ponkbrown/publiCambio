@@ -1,6 +1,7 @@
 import exifread
 import json
 import requests
+from datetime import datetime
 
 def exifobj2lista(objDatos):
     ''' Recibe un objeto tag GPS de exifdata y devuelve una tupla de
@@ -20,6 +21,13 @@ def grados2decimal(grados):
 
     GPSdecimal = Grad + (Mins/60) + (Secs/3600)
     return GPSdecimal
+
+def findDatetime(imagen):
+    ''' Encuentra la fecha en los datos Exif de la imagen y debuelve el objeto datetime '''
+    tags = exifread.process_file(open(imagen, 'rb'))
+    imageDateTime = tags['Image DateTime'].values
+    datetimeObj = datetime.strptime(imageDateTime, '%Y:%m:%d %H:%M:%S')
+    return datetimeObj
 
 def findGPS(imagen):
     ''' Encuentra los datos GPS si existen de una imagen y devuelve
@@ -50,7 +58,7 @@ def findGPS(imagen):
 def reverseGeo(latitud, longitud, api='GoogleApi.secret'):
     ''' Encuentra la direccion a partir de los datos GEO latitud y longitud
     se requiere de un api de google '''
-    
+
     #Cargamos el api
     with open(api, 'r') as f:
         GAPI = json.loads(f.read())
@@ -66,7 +74,3 @@ def reverseGeo(latitud, longitud, api='GoogleApi.secret'):
         return 'No se pudo obtener la direccion'
 
     return direccion
-
-
-
-    return 
