@@ -9,6 +9,7 @@ class Cambio(db.Model):
     venta = db.Column(db.Float)
     foto = db.Column(db.String(20))
     timestamp = db.Column(db.DateTime)
+    exiftimestamp = db.Column(db.DateTime)
     ubicacion_id = db.Column(db.Integer, db.ForeignKey('ubicacion.id'))
     ubicacion = db.relationship('Ubicacion', backref='cambios')
 
