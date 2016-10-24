@@ -13,8 +13,22 @@
       <h3> Actualizaciones de hoy: </h3>
   </div>
   <div class='col-xs-6'>
-      <h2>{{ fecha.strftime('%d, %b %Y') }}
+      <h4>{{ fecha.strftime('%d, %b %Y') }} </h4>
   </div>
+</div>
+<div class='row'>
+    <div class=col-xs-3>
+        <p><b>Timestamp</b></p>
+    </div>
+    <div class=col-xs-3>
+        <p><b>Compra</b></p>
+    </div>
+    <div class=col-xs-3>
+        <p><b>Venta</b></p>
+    </div>
+    <div class=col-xs-3>
+        <p><b>Foto</b></p>
+    </div>
 </div>
 {% for captura in capturasHoy%}
 <div class="row">
