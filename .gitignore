@@ -12,3 +12,5 @@ lib/
 *.jpg
 
 *.secret
+
+basedatos.sqlite

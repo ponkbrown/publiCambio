@@ -3,6 +3,28 @@
 {% block title %} Codigo | publiCambio {% endblock %}
 
 {% block jumbotron %}
-<h3>{{ fecha }}</h3>
+<h3>{{ fecha.strftime('Actualizacion: %d, %b %Y - %H:%M') }}</h3>
 {{ wtf.quick_form(forma) }}
 {% endblock %}
+
+{% block extra %}
+<div class="row">
+  <div class='col-xs-12'>
+      <h3> Ultimas Actualizaciones </h3>
+  </div>
+</div>
+{% for captura in capturasHoy%}
+<div class="row">
+<div class="col-xs-6">
+    {{ captura.timestamp}}
+</div>
+<div class="col-xs-3">
+    {{ captura.compra }}
+</div>
+<div class='col-xs-3'>
+    {{captura.venta}}
+</div>
+</div>
+
+{% endfor %}
+{%endblock%}
