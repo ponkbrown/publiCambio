@@ -1,3 +1,5 @@
+# Funciones que uso para el sitio de cambio, sobre todo estas funciones saca informacion de los datos exif de las fotos
+# y estos datos los usa la app para agregar los datos a la base de datos
 import exifread
 import json
 import requests
